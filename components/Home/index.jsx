@@ -12,6 +12,7 @@ import DatePicker from 'react-datepicker';
 import { registerLocale } from 'react-datepicker';
 import id from 'date-fns/locale/id';
 import axios from 'axios';
+import { format } from 'date-fns';
 
 registerLocale('id', id);
 
@@ -22,20 +23,34 @@ const HalamanUtama = () => {
   const [fromLocation, setFromLocation] = useState('Choose...');
   const [toLocation, setToLocation] = useState('Choose...');
   const [dataDestinations, setDataDestinations] = useState([]);
+  const [dataKota, setDataKota] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const getDestinations = async () => {
       try {
         const response = await axios.get('/api/home');
         const destinations = response.data.data;
-        console.log(destinations);
         setDataDestinations(destinations);
       } catch (error) {
         console.log('Error fetching destinations:', error.message);
       }
     };
 
-    fetchData();
+    getDestinations();
+  }, []);
+
+  useEffect(() => {
+    const getCity = async () => {
+      try {
+        const response = await axios.get('/api/getCity');
+        const city = response.data.data;
+        setDataKota(city);
+      } catch (error) {
+        console.log('Error fetching destinations:', error.message);
+      }
+    };
+
+    getCity();
   }, []);
 
   const handleDateChange = (date) => {
@@ -57,6 +72,26 @@ const HalamanUtama = () => {
     setToLocation(tempLocation);
   };
 
+  const handleSearchOneWay = async (e) => {
+    e.preventDefault();
+    try {
+      if (fromLocation === 'Choose...' || toLocation === 'Choose...' || selectedDate === null) {
+        console.log('Please select valid locations and date.');
+        return;
+      }
+      const formattedDate = format(selectedDate, 'dd-MM-yyyy');
+      console.log('Searching for flights...');
+      console.log('Selected Date:', formattedDate);
+      console.log('From Location:', fromLocation);
+      console.log('To Location:', toLocation);
+
+      const response = await axios.get(`http://localhost:5000/v1/api/tiket-one-way-fe?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
+      console.log('API Response:', response.data);
+    } catch (error) {
+      console.log('Error fetching destinations:', error.message);
+    }
+  };
+
   return (
     <div className="container ">
       <div className={`card ${styles.card} bg-light`} style={{ width: '97%' }}>
@@ -73,9 +108,11 @@ const HalamanUtama = () => {
                 </InputGroup.Text>
                 <FormControl as="select" id="from" value={fromLocation} onChange={(e) => setFromLocation(e.target.value)}>
                   <option selected>Choose...</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  {dataKota.map((kota) => (
+                    <option key={kota.id} value={kota.kota}>
+                      {kota.kota}
+                    </option>
+                  ))}
                 </FormControl>
               </InputGroup>
             </Col>
@@ -92,9 +129,11 @@ const HalamanUtama = () => {
                 </InputGroup.Text>
                 <FormControl as="select" id="to" value={toLocation} onChange={(e) => setToLocation(e.target.value)}>
                   <option selected>Choose...</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  {dataKota.map((kota) => (
+                    <option key={kota.id} value={kota.kota}>
+                      {kota.kota}
+                    </option>
+                  ))}
                 </FormControl>
               </InputGroup>
             </Col>
@@ -134,7 +173,7 @@ const HalamanUtama = () => {
                     <InputGroup>
                       <InputGroup.Text>
                         <MdAirlineSeatReclineExtra className="me-3" />
-                        Passenge
+                        Passenger
                       </InputGroup.Text>
                     </InputGroup>
                   </Col>
@@ -168,7 +207,7 @@ const HalamanUtama = () => {
             </Col>
           </Row>
         </div>
-        <Button className="fw-bold" style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }}>
+        <Button className="fw-bold" style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }} onClick={handleSearchOneWay}>
           Cari Penerbangan
         </Button>
       </div>
@@ -196,7 +235,7 @@ const HalamanUtama = () => {
         </div>
         <Row className="mt-5">
           {dataDestinations.map((destination) => (
-            <Col md={4} key={destination.id}>
+            <Col md={4} key={destination.id} className="mb-3">
               <div className="card" style={{ width: '18rem' }}>
                 <img src={destination.foto} height={'300px'} alt="Rumah Adat" />
                 <div className="card-body">
