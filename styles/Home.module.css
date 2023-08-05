@@ -129,7 +129,6 @@
   background-color: rgb(255, 255, 255);
   background-blend-mode: multiply;
   top: -11rem;
-  left: 5rem;
   z-index: 1;
 }
 
@@ -156,6 +155,11 @@
 
 .roundtripButton:hover {
   color: rgb(100, 4, 100);
+}
+
+.destination {
+  position: relative;
+  top: -19rem;
 }
 
 
