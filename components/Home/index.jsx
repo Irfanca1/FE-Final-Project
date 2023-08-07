@@ -13,6 +13,8 @@ import { registerLocale } from 'react-datepicker';
 import id from 'date-fns/locale/id';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { useRouter } from 'next/router';
+import Swal from 'sweetalert2';
 
 registerLocale('id', id);
 
@@ -24,6 +26,8 @@ const HalamanUtama = () => {
   const [toLocation, setToLocation] = useState('Choose...');
   const [dataDestinations, setDataDestinations] = useState([]);
   const [dataKota, setDataKota] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const getDestinations = async () => {
@@ -74,22 +78,40 @@ const HalamanUtama = () => {
 
   const handleSearchOneWay = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       if (fromLocation === 'Choose...' || toLocation === 'Choose...' || selectedDate === null) {
-        console.log('Please select valid locations and date.');
-        return;
+        Swal.fire({
+          title: 'Lengkapi data yang ingin dicari',
+          text: 'Silakan isi asal kota, kota tujuan, dan tanggal berangkat',
+          icon: 'error',
+          showConfirmButton: true,
+          timer: 3000,
+        });
       }
       const formattedDate = format(selectedDate, 'dd-MM-yyyy');
-      console.log('Searching for flights...');
-      console.log('Selected Date:', formattedDate);
-      console.log('From Location:', fromLocation);
-      console.log('To Location:', toLocation);
 
       const response = await axios.get(`http://localhost:5000/v1/api/tiket-one-way-fe?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
       console.log('API Response:', response.data);
+      router.push(`/hasilPencarian?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
     } catch (error) {
-      console.log('Error fetching destinations:', error.message);
+      const formattedDate = selectedDate ? format(selectedDate, 'dd-MM-yyyy') : '';
+      const errorResponse = error.response ? error.response.data.message : 'Error';
+      if (error.response) {
+        router.push(`/hasilPencarian?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}&message=${errorResponse}`);
+      } else {
+        Swal.fire({
+          title: 'Lengkapi data yang ingin dicari',
+          text: 'Silakan isi asal kota, kota tujuan, dan tanggal berangkat',
+          icon: 'error',
+          showConfirmButton: true,
+          timer: 3000,
+        });
+      }
     }
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
   };
 
   return (

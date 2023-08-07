@@ -109,8 +109,14 @@
 }
 
 .customButton {
-  background-color: rgb(147, 6, 147);
-  border-color: rgb(182, 24, 182);
+  background-color: rgb(147, 6, 147) !important;
+  border-color: rgb(182, 24, 182) !important;
+  border: 3px !important;
+}
+
+.customButton:hover {
+  background-color: rgb(90, 4, 90) !important;
+  border-color: rgb(182, 24, 182) !important;
   border: 3px;
 }
 
@@ -134,6 +140,10 @@
 
 .span {
   color: rgb(147, 6, 147);
+}
+
+.spanBackground {
+  background-color: rgb(209, 11, 209);
 }
 
 .card {
@@ -162,6 +172,30 @@
   top: -19rem;
 }
 
+.box1 {
+  width: 50rem;
+  background-color: rgb(147, 6, 147);
+}
+
+.box2 {
+  width: 15rem;
+}
+
+.spanSelisihJamMenit {
+  margin-left: 93px;
+  font-size: 12px;
+}
+
+.spanHarga {
+  color: rgb(147, 6, 147);
+}
+
+.selected {
+  background-color: white !important;
+  color: black !important;
+  font-weight: bold !important;
+  border-color: #b502af !important;
+}
 
 /* Enable hover only on non-touch devices */
 /* @media (hover: hover) and (pointer: fine) {
