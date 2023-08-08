@@ -92,8 +92,45 @@ const HalamanUtama = () => {
       const formattedDate = format(selectedDate, 'dd-MM-yyyy');
 
       const response = await axios.get(`http://localhost:5000/v1/api/tiket-one-way-fe?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
-      console.log('API Response:', response.data);
       router.push(`/hasilPencarian?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
+    } catch (error) {
+      const formattedDate = selectedDate ? format(selectedDate, 'dd-MM-yyyy') : '';
+      const errorResponse = error.response ? error.response.data.message : 'Error';
+      if (error.response) {
+        router.push(`/hasilPencarian?tanggalBerangkat=${formattedDate}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}&message=${errorResponse}`);
+      } else {
+        Swal.fire({
+          title: 'Lengkapi data yang ingin dicari',
+          text: 'Silakan isi asal kota, kota tujuan, dan tanggal berangkat',
+          icon: 'error',
+          showConfirmButton: true,
+          timer: 3000,
+        });
+      }
+    }
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+  };
+
+  const handleSearchRoundTrip = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      if (fromLocation === 'Choose...' || toLocation === 'Choose...' || selectedDate === null || selectedDateReturn === null) {
+        Swal.fire({
+          title: 'Lengkapi data yang ingin dicari',
+          text: 'Silakan isi asal kota, kota tujuan, tanggal berangkat, dan tanggal pulang',
+          icon: 'error',
+          showConfirmButton: true,
+          timer: 3000,
+        });
+      }
+      const formattedDate = format(selectedDate, 'dd-MM-yyyy');
+      const formattedDateReturn = format(selectedDateReturn, 'dd-MM-yyyy');
+
+      const response = await axios.get(`http://localhost:5000/v1/api/tiket-round-trip-fe?tanggalBerangkat=${formattedDate}&tanggalPulang=${formattedDateReturn}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
+      router.push(`/hasilPencarian/roundTrip?tanggalBerangkat=${formattedDate}&tanggalPulang=${formattedDateReturn}&kotaAwal=${fromLocation}&kotaTujuan=${toLocation}`);
     } catch (error) {
       const formattedDate = selectedDate ? format(selectedDate, 'dd-MM-yyyy') : '';
       const errorResponse = error.response ? error.response.data.message : 'Error';
@@ -229,7 +266,7 @@ const HalamanUtama = () => {
             </Col>
           </Row>
         </div>
-        <Button className="fw-bold" style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }} onClick={handleSearchOneWay}>
+        <Button className="fw-bold" style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }} onClick={isRoundtrip ? handleSearchRoundTrip : handleSearchOneWay}>
           Cari Penerbangan
         </Button>
       </div>

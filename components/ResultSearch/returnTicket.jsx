@@ -17,13 +17,22 @@ const getLocalStorageDate = () => {
   return localStorage.getItem('selectedDate');
 };
 
-const HasilPencarian = () => {
+const setLocalStorageDateReturn = (date) => {
+  localStorage.setItem('selectedDateReturn', date);
+};
+
+const getLocalStorageDateReturn = () => {
+  return localStorage.getItem('selectedDateReturn');
+};
+
+const HasilPencarianRoundTripReturn = () => {
   const router = useRouter();
-  const { tanggalBerangkat, kotaAwal, kotaTujuan, message } = router.query;
+  const { tanggalBerangkat, kotaAwal, kotaTujuan, tanggalPulang, ticketBerangkat } = router.query;
   const [dataTicket, setDataTicket] = useState([]);
   const [hargaTermurah, setHargaTermurah] = useState([]);
   const [hargaTermahal, setHargaTermahal] = useState([]);
   const [selectedDate, setSelectedDate] = useState(tanggalBerangkat || null);
+  const [selectedDateReturn, setSelectedDateReturn] = useState(tanggalPulang || null);
   const [showHargaTermurah, setShowHargaTermurah] = useState(false);
   const [showHargaTermahal, setShowHargaTermahal] = useState(false);
 
@@ -39,17 +48,29 @@ const HasilPencarian = () => {
   }, [selectedDate]);
 
   useEffect(() => {
-    const getResultSearching = async () => {
+    const storedDate = getLocalStorageDateReturn();
+    setSelectedDateReturn(storedDate || tanggalPulang || null);
+  }, [tanggalPulang]);
+
+  useEffect(() => {
+    if (selectedDateReturn) {
+      setLocalStorageDateReturn(selectedDateReturn);
+    }
+  }, [selectedDateReturn]);
+
+  useEffect(() => {
+    const getResultSearchingRoundTrip = async () => {
       try {
-        const date = localStorage.getItem('selectedDate');
-        const response = await axios.get(`http://localhost:5000/v1/api/tiket-one-way-fe?tanggalBerangkat=${date}&kotaAwal=${kotaAwal}&kotaTujuan=${kotaTujuan}`);
+        const dateDeparture = localStorage.getItem('selectedDateReturn');
+        const dateReturn = localStorage.getItem('selectedDateReturn');
+        const response = await axios.get(`http://localhost:5000/v1/api/tiket-round-trip-fe?tanggalBerangkat=${dateReturn}&kotaAwal=${kotaAwal}&kotaTujuan=${kotaTujuan}`);
         const data = response.data;
-        data.length !== 0 ? setDataTicket(response.data.data) : 'Tidak ada penerbangan pada tanggal ini!';
+        data.length !== 0 ? setDataTicket(response.data.dataPergi) : 'Tidak ada penerbangan pada tanggal ini!';
         setShowHargaTermurah(false);
         setShowHargaTermahal(false);
       } catch (error) {
-        const errorResponse = error.response ? error.response.data.message : error.message;
-        console.log('Index : ' + errorResponse);
+        const errorResponse = error.response ? error.response.data : error.message;
+        console.log('Index : ' + errorResponse.data);
         if (errorResponse) {
           Swal.fire({
             title: errorResponse,
@@ -62,7 +83,7 @@ const HasilPencarian = () => {
       }
     };
 
-    getResultSearching();
+    getResultSearchingRoundTrip();
   }, [tanggalBerangkat, kotaAwal, kotaTujuan]);
 
   const [showDetail, setShowDetail] = useState(false);
@@ -117,6 +138,7 @@ const HasilPencarian = () => {
 
   return (
     <div className="container">
+      <div className={`fs-5 text-center mb-5 rounded text-light fw-bold ${styles.boxPilihPenerbangan}`}>Pilih Penerbangan Pulang</div>
       <div className={`${styles.description}`}>
         {dataTicket.length === 0 ? (
           <Row>
@@ -232,4 +254,4 @@ const HasilPencarian = () => {
   );
 };
 
-export default HasilPencarian;
+export default HasilPencarianRoundTripReturn;
