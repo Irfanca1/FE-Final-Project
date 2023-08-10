@@ -1,24 +1,22 @@
 import { Inter } from 'next/font/google';
 import styles from '@/styles/Home.module.css';
-import HalamanUtama from '@/components/Home';
 import Navbar from '@/components/Navbar';
-import Header from '@/components/Home/header';
 import Head from 'next/head';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import DetailSearching from '@/components/DetailSearching';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function Home(props) {
+export default function DetailRoundTrip(props) {
   return (
     <>
       <Head>
-        <title>Halaman Utama</title>
+        <title>Detail Penerbangan Round Trip</title>
       </Head>
       <Navbar accessToken={props.accessToken} username={props.username} />
-      <Header />
       <main className={`${styles.main} ${inter.className}`}>
         <div className={styles.description}>
-          <HalamanUtama />
+          <DetailSearching accessToken={props.accessToken} />
         </div>
       </main>
     </>

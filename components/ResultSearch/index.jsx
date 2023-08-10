@@ -188,7 +188,9 @@ const HasilPencarian = () => {
                           </Col>
                           <Col>
                             <span className={`d-block mb-2 fw-bold ${styles.spanHarga}`}>{data.maskapai.harga_tiket}</span>
-                            <Button style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }}>Pilih</Button>
+                            <Button style={{ backgroundColor: 'rgb(147, 6, 147)', borderColor: 'rgb(182, 24, 182)' }} onClick={() => router.push(`/detailsearching/oneWay?ticketBerangkat=${data.id}`)}>
+                              Pilih
+                            </Button>
                           </Col>
                         </Row>
                       </Card.Text>

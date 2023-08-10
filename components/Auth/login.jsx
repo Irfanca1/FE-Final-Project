@@ -27,9 +27,13 @@ const Login = () => {
     setIsLoading(true);
     try {
       const response = await axios.post('/api/login', formData);
-      console.log(response.data.data.accessToken);
       sessionStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('token', response.data.data.accessToken);
+      Cookies.set('username', response.data.data.username);
+      Cookies.set('email', response.data.data.email);
+      Cookies.set('namaLengkap', response.data.data.nama_lengkap);
+      Cookies.set('nomorTelepon', response.data.data.nomor_telepon);
+      Cookies.set('alamat', response.data.data.alamat);
       Cookies.set('accessToken', response.data.data.accessToken);
       localStorage.setItem('token', response.data.data.accessToken);
 
@@ -56,6 +60,10 @@ const Login = () => {
 
   const handleClickForgotPassword = () => {
     router.push('/otp/forgotPassword');
+  };
+
+  const handleClickHalamanUtama = () => {
+    router.push('/');
   };
 
   return (
@@ -89,6 +97,11 @@ const Login = () => {
             Lupa Password?{' '}
             <Button onClick={handleClickForgotPassword} className="fw-bold bg-transparent border border-light" style={{ color: 'rgb(1, 1, 255)' }}>
               Klik di sini
+            </Button>
+          </p>
+          <p className="bg-transparent border border-light fs-6 text-center ">
+            <Button onClick={handleClickHalamanUtama} className="fw-bold bg-transparent border border-light" style={{ color: 'rgb(1, 1, 255)' }}>
+              Kembali ke halaman utama
             </Button>
           </p>
         </Col>
