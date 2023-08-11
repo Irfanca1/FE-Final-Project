@@ -202,6 +202,36 @@
   border-color: #b502af !important;
 }
 
+.availableSeat {
+  background-color: #34d399;
+  color: white;
+  cursor: pointer;
+}
+
+.occupiedSeat {
+  background-color: #d1d5db; 
+  color: black;
+  cursor: not-allowed;
+}
+
+.seatContainer {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 20px;
+}
+
+.notClickable {
+  cursor: not-allowed;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+
 /* Enable hover only on non-touch devices */
 /* @media (hover: hover) and (pointer: fine) {
   .card:hover {

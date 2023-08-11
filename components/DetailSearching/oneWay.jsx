@@ -3,17 +3,100 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
 import styles from '@/styles/Home.module.css';
+import Swal from 'sweetalert2';
+import Cookies from 'js-cookie';
 
 const DetailSearchingOneWay = ({ accessToken }) => {
   const router = useRouter();
   const { ticketBerangkat } = router.query;
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
-    nama: '',
-    namaKeluarga: '',
-    nomorTelepon: '',
+    id_penerbangan: ticketBerangkat,
+    nama_lengkap: '',
+    nama_keluarga: '',
+    nomor_telepon: '',
     email: '',
+    jumlah_penumpang: '',
   });
+  const [occupiedSeats, setOccupiedSeats] = useState([]);
+  const totalSeats = 72;
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+
+  useEffect(() => {
+    const getKursi = async () => {
+      try {
+        const response = await axios.get('/api/getKursi');
+        const kursiData = response.data.data;
+        const occupiedSeatCodes = kursiData.map((seat) => seat.kursi);
+
+        const allOccupiedSeats = occupiedSeatCodes.join(',');
+
+        const individualSeats = allOccupiedSeats.split(',');
+
+        setOccupiedSeats(individualSeats);
+        console.log(occupiedSeats);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    getKursi();
+  }, []);
+
+  const isSeatOccupied = (seatCode) => {
+    return occupiedSeats.includes(seatCode);
+  };
+
+  const renderSeats = () => {
+    const seats = [];
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let alphabetIndex = 0;
+
+    for (let seatNumber = 1; seatNumber <= totalSeats; seatNumber++) {
+      const row = alphabet[alphabetIndex];
+      const seatCode = `${row}${Math.ceil(seatNumber / alphabet.length)}`;
+      const isOccupied = isSeatOccupied(seatCode);
+      const seatColor = isOccupied ? styles.occupiedSeat : styles.availableSeat;
+
+      if (isOccupied) {
+        seats.push(
+          <div key={seatNumber} className={`${styles.seat} ${seatColor}`}>
+            {seatCode}
+          </div>
+        );
+      } else {
+        seats.push(
+          <div key={seatNumber} className={`${styles.seat} ${seatColor} ${styles.clickable}`} onClick={() => !isFormSubmitted && handleSeatClick(seatCode)}>
+            {seatCode}
+          </div>
+        );
+      }
+
+      if (alphabetIndex < alphabet.length - 1) {
+        alphabetIndex++;
+      } else {
+        alphabetIndex = 0;
+      }
+    }
+
+    return seats;
+  };
+
+  const handleSeatClick = (seatCode) => {
+    if (isSeatOccupied(seatCode)) {
+      const updatedOccupiedSeats = occupiedSeats.filter((seat) => seat !== seatCode);
+      const updatedSelectedSeats = selectedSeats.filter((seat) => seat !== seatCode);
+      setOccupiedSeats(updatedOccupiedSeats);
+      setSelectedSeats(updatedSelectedSeats);
+    } else {
+      const updatedOccupiedSeats = [...occupiedSeats, seatCode];
+      const updatedSelectedSeats = [...selectedSeats, seatCode];
+      setOccupiedSeats(updatedOccupiedSeats);
+      setSelectedSeats(updatedSelectedSeats);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -28,45 +111,95 @@ const DetailSearchingOneWay = ({ accessToken }) => {
       try {
         const response = await axios.get(`http://localhost:5000/v1/api/select-ticket/${ticketBerangkat}`);
         setData(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
-        console.log('error: ' + error.response.data);
+        Swal.fire({
+          title: error.response.message,
+          text: '',
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: true,
+        });
       }
     };
 
     detailPenerbanganOneWay();
   }, [ticketBerangkat]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Add your form submission logic here
-    console.log('Form data submitted:', formData);
+    try {
+      const accessToken = Cookies.get('accessToken');
+
+      if (!accessToken) {
+        Swal.fire({
+          title: 'Silakan login terlebih dahulu',
+          text: '',
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        return;
+      }
+
+      const updatedFormData = {
+        id_penerbangan: parseInt(ticketBerangkat),
+        nama_lengkap: formData.nama_lengkap,
+        nama_keluarga: formData.nama_keluarga,
+        nomor_telepon: formData.nomor_telepon,
+        email: formData.email,
+        jumlah_penumpang: parseInt(formData.jumlah_penumpang),
+        kursi: selectedSeats.join(','),
+      };
+      console.log(updatedFormData);
+
+      const response = await axios.post('/api/order', updatedFormData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      console.log('API response : ', response.data);
+
+      setIsFormSubmitted(true);
+    } catch (error) {
+      console.log('error : ', error.response);
+      console.log(error.message);
+    }
   };
 
   return (
     <Row>
       <h3 className="text-center fw-bold">{accessToken ? '' : <div className="alert alert-danger">Silakan Login Terlebih Dahulu Untuk Memesan Tiket!</div>}</h3>
-      <Col md={7} style={{ width: '30rem' }}>
-        <Card>
+      <Col md={7} style={{ width: '40rem' }}>
+        <Card className="mb-3">
           <Card.Body>
             <Card.Title className="fw-bold">Isi Data Pemesan</Card.Title>
             <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="name">
-                <Form.Label>Nama</Form.Label>
-                <Form.Control type="text" name="nama" value={formData.nama} onChange={handleInputChange} placeholder="Masukkan nama anda" />
+              <Form.Group controlId="nama_lengkap">
+                <Form.Label>Nama Lengkap</Form.Label>
+                <Form.Control type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleInputChange} placeholder="Masukkan nama anda" />
               </Form.Group>
               <Form.Group controlId="name">
                 <Form.Label>Nama Keluarga</Form.Label>
-                <Form.Control type="text" name="namaKeluarga" value={formData.namaKeluarga} onChange={handleInputChange} placeholder="Masukkan nama keluarga anda" />
+                <Form.Control type="text" name="nama_keluarga" value={formData.nama_keluarga} onChange={handleInputChange} placeholder="Masukkan nama keluarga anda" />
               </Form.Group>
               <Form.Group controlId="name">
                 <Form.Label>Nomor Telepon</Form.Label>
-                <Form.Control type="text" name="nomorTelepon" value={formData.nomorTelepon} onChange={handleInputChange} placeholder="Masukkan nomor telepom amda" />
+                <Form.Control type="text" name="nomor_telepon" value={formData.nomor_telepon} onChange={handleInputChange} placeholder="Masukkan nomor telepom amda" />
               </Form.Group>
               <Form.Group controlId="email">
                 <Form.Label>Email</Form.Label>
                 <Form.Control type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Masukkan email anda" />
               </Form.Group>
+              <Form.Group controlId="jumlah_penumpang">
+                <Form.Label>Jumlah Penumpang</Form.Label>
+                <Form.Control type="text" name="jumlah_penumpang" value={formData.jumlah_penumpang} onChange={handleInputChange} placeholder="Masukkan email anda" />
+              </Form.Group>
+              <Card className="mt-3 mb-3">
+                <div className="mt-4 p-2">
+                  <h5 className={`${styles.spanHarga} fw-bold`}>Pilihan Kursi</h5>
+                  <div className={styles.seatContainer}>{renderSeats()}</div>
+                </div>
+              </Card>
               <Button type="submit" variant="primary">
                 Submit
               </Button>
@@ -74,7 +207,7 @@ const DetailSearchingOneWay = ({ accessToken }) => {
           </Card.Body>
         </Card>
       </Col>
-      <Col md={5}>
+      <Col md={4} style={{ width: '25rem' }}>
         <Card className="mb-3">
           <div className="mt-4 p-2">
             <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan</h5>
