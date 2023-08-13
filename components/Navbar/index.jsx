@@ -39,6 +39,10 @@ const Navbar = ({ accessToken, username }) => {
     router.push('/profile/');
   };
 
+  const handleToHistory = () => {
+    router.push('/historyorder/');
+  };
+
   return (
     <nav className="navbar bg-light shadow-sm">
       <div className="container-fluid container">
@@ -65,7 +69,7 @@ const Navbar = ({ accessToken, username }) => {
                   </button>
                 </li>
                 <li>
-                  <button className={`rounded dropdown-item p-2 bg-transparent text-dark border border-light`}>
+                  <button className={`rounded dropdown-item p-2 bg-transparent text-dark border border-light`} onClick={handleToHistory}>
                     <RiHistoryLine className={`me-2 `} />
                     History Pemesanan
                   </button>

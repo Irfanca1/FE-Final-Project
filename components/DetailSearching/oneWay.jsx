@@ -19,9 +19,8 @@ const DetailSearchingOneWay = ({ accessToken }) => {
     jumlah_penumpang: '',
   });
   const [occupiedSeats, setOccupiedSeats] = useState([]);
-  const totalSeats = 72;
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const totalSeats = 72;
 
   useEffect(() => {
     const getKursi = async () => {
@@ -35,7 +34,6 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         const individualSeats = allOccupiedSeats.split(',');
 
         setOccupiedSeats(individualSeats);
-        console.log(occupiedSeats);
       } catch (error) {
         console.log(error.message);
       }
@@ -68,7 +66,7 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         );
       } else {
         seats.push(
-          <div key={seatNumber} className={`${styles.seat} ${seatColor} ${styles.clickable}`} onClick={() => !isFormSubmitted && handleSeatClick(seatCode)}>
+          <div key={seatNumber} className={`${styles.seat} ${seatColor} ${styles.clickable}`} onClick={() => handleSeatClick(seatCode)}>
             {seatCode}
           </div>
         );
@@ -150,16 +148,21 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         jumlah_penumpang: parseInt(formData.jumlah_penumpang),
         kursi: selectedSeats.join(','),
       };
-      console.log(updatedFormData);
 
       const response = await axios.post('/api/order', updatedFormData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      console.log('API response : ', response.data);
-
-      setIsFormSubmitted(true);
+      Swal.fire({
+        title: response.data.message,
+        text: 'Silakan lakukan pembayaran!',
+        timer: 3000,
+        showConfirmButton: true,
+        icon: 'success',
+      }).then(() => {
+        router.push(`/payment?order=${response.data.data.id}`);
+      });
     } catch (error) {
       console.log('error : ', error.response);
       console.log(error.message);
