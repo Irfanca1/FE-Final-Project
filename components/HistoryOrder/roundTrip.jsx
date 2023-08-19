@@ -8,12 +8,11 @@ import axios from 'axios';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 import { LuMoveHorizontal } from 'react-icons/lu';
 
-const HistoryOrder = ({ accessToken }) => {
+const HistoryOrderRoundTrip = ({ accessToken }) => {
   const router = useRouter();
   const [data, setData] = useState([]);
   const [dataId, setDataId] = useState(null);
   const [order, setOrder] = useState([]);
-  const [allOrder, setAllOrder] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   const handleCardClick = (orderId) => {
@@ -80,7 +79,7 @@ const HistoryOrder = ({ accessToken }) => {
         setOrder(response.data.data);
         console.log(response.data.data);
       } catch (error) {
-        console.log(error.message);
+        console.log(error.response);
       }
     };
     detailOrder();
@@ -165,7 +164,7 @@ const HistoryOrder = ({ accessToken }) => {
               <Col md={5}>
                 <Card>
                   <div className="mt-4 p-2">
-                    <h5 className={`${styles.spanHarga} fw-bold`}>Detail Pesanan Berangkat</h5>
+                    <h5 className={`${styles.spanHarga} fw-bold`}>Detail Pesanan</h5>
                     {order.order && (
                       <h5 className={`fw-bold`}>
                         Kode Booking: <span className={`${styles.spanHarga} fw-bold`}>{order.order.kode_booking}</span>
@@ -173,21 +172,21 @@ const HistoryOrder = ({ accessToken }) => {
                     )}
                     <div>
                       <div className="d-flex">
-                        {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.berangkat.jam_berangkat}</p>}
-                        <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
+                        {order.tiketBerangkat && <p className="bg-transparent fw-bold border border-light">{order.tiketBerangkat.jam_berangkat}:00</p>}
+                        <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
                       </div>
-                      {order.tiket && <div className={`ms-3`}>{order.tiket.berangkat.tanggal_berangkat}</div>}
-                      {order.tiket && (
+                      {order.tiketBerangkat && <div className={`ms-3`}>{order.tiketBerangkat.tanggal_berangkat}</div>}
+                      {order.tiketBerangkat && (
                         <div>
-                          <div className={`ms-3`}>{order.tiket.berangkat.bandaraAwal.nama_bandara}</div> <hr />
+                          <div className={`ms-3`}>{order.tiketBerangkat.bandaraAwal.nama_bandara}</div> <hr />
                         </div>
                       )}
-                      {order.tiket && (
+                      {order.penerbanganBerangkat && (
                         <div>
                           <div className={`fw-bold ms-5`}>
-                            {order.tiket.berangkat.maskapai.nama_maskapai} - {order.tiket.berangkat.maskapai.tipe_maskapai}
+                            {order.penerbanganBerangkat.maskapai.nama_maskapai} - {order.penerbanganBerangkat.maskapai.tipe_maskapai}
                           </div>
-                          <div className={`fw-bold ms-5`}>{order.tiket.berangkat.maskapai.kode_maskapai}</div>
+                          <div className={`fw-bold ms-5`}>{order.penerbanganBerangkat.maskapai.kode_maskapai}</div>
                         </div>
                       )}
                       <div className="d-block ms-5">
@@ -198,22 +197,22 @@ const HistoryOrder = ({ accessToken }) => {
                       </div>{' '}
                       <hr />
                       <div className="d-flex">
-                        {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.berangkat.jam_kedatangan}</p>}
+                        {order.tiketBerangkat && <p className="bg-transparent fw-bold border border-light">{order.tiketBerangkat.jam_kedatangan}:00</p>}
                         <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
                       </div>
-                      {order.tiket && <div className={`ms-3`}>{order.tiket.berangkat.tanggal_kedatangan}</div>}
-                      {order.tiket && (
+                      {order.tiketBerangkat && <div className={`ms-3`}>{order.tiketBerangkat.tanggal_kedatangan}</div>}
+                      {order.tiketBerangkat && (
                         <div>
-                          <div className={`ms-3`}>{order.tiket.berangkat.bandaraTujuan.nama_bandara}</div> <hr />
+                          <div className={`ms-3`}>{order.tiketBerangkat.bandaraTujuan.nama_bandara}</div> <hr />
                         </div>
                       )}
                       <div>
                         <div className="fw-bold">Rincian harga</div>
                         <div className="d-flex">
                           <p className="bg-transparent border border-light">Harga Tiket</p>
-                          {order.tiket && (
+                          {order.penerbanganBerangkat && (
                             <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.berangkat.maskapai.harga_tiket}</p>
+                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.penerbanganBerangkat.maskapai.harga_tiket}</p>
                             </div>
                           )}
                         </div>
@@ -222,79 +221,6 @@ const HistoryOrder = ({ accessToken }) => {
                           {order.order && (
                             <div className="ms-auto">
                               <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{order.order.jumlah_penumpang}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Total Harga Tiket Berangkat</p>
-                          {order.tiket && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.berangkat.totalHargaTiketBerangkat}</p>
-                            </div>
-                          )}
-                        </div>
-                        {order.tiket && (
-                          <div>
-                            <h5 className={`${styles.spanHarga} fw-bold mt-5`}>Detail Pesanan Pulang</h5>
-                            <div className="d-flex">
-                              {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_berangkat}</p>}
-                              <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
-                            </div>
-                            {order.tiket && <div className={`ms-3`}>{order.tiket.pulang.tanggal_berangkat}</div>}
-                            {order.tiket && (
-                              <div>
-                                <div className={`ms-3`}>{order.tiket.pulang.bandaraAwal.nama_bandara}</div> <hr />
-                              </div>
-                            )}
-                            {order.tiket && (
-                              <div>
-                                <div className={`fw-bold ms-5`}>
-                                  {order.tiket.pulang.maskapai.nama_maskapai} - {order.tiket.pulang.maskapai.tipe_maskapai}
-                                </div>
-                                <div className={`fw-bold ms-5`}>{order.tiket.pulang.maskapai.kode_maskapai}</div>
-                              </div>
-                            )}
-                            <div className="d-block ms-5">
-                              <div className={`fw-bold`}>Informasi : </div>
-                              <div>Baggage 20 kg </div>
-                              <div>Cabin Baggage 7 kg </div>
-                              <div>In Flight Fntertainment </div>
-                            </div>{' '}
-                            <hr />
-                            <div className="d-flex">
-                              {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_kedatangan}</p>}
-                              <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
-                            </div>
-                          </div>
-                        )}
-                        {order.tiket && <div className={`ms-3`}>{order.tiket.pulang.tanggal_kedatangan}</div>}
-                        {order.tiket && (
-                          <div>
-                            <div className={`ms-3`}>{order.tiket.pulang.bandaraTujuan.nama_bandara}</div> <hr />
-                          </div>
-                        )}
-                        <div className="fw-bold">Rincian harga</div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Harga Tiket</p>
-                          {order.tiket && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.maskapai.harga_tiket}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Jumlah Penumpang</p>
-                          {order.order && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{order.order.jumlah_penumpang}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Total Harga Tiket Pulang</p>
-                          {order.tiket && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.totalHargaTiketPulang}</p>
                             </div>
                           )}
                         </div>
@@ -341,4 +267,4 @@ const HistoryOrder = ({ accessToken }) => {
   );
 };
 
-export default HistoryOrder;
+export default HistoryOrderRoundTrip;

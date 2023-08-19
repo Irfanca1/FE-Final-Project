@@ -3,17 +3,100 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Card, Form, Button, Row, Col } from 'react-bootstrap';
 import styles from '@/styles/Home.module.css';
+import Cookies from 'js-cookie';
+import Swal from 'sweetalert2';
 
 const DetailSearching = ({ accessToken }) => {
   const router = useRouter();
   const { ticketBerangkat, ticketPulang } = router.query;
   const [data, setData] = useState([]);
   const [formData, setFormData] = useState({
-    nama: '',
-    namaKeluarga: '',
-    nomorTelepon: '',
+    id_penerbangan_berangkat: ticketBerangkat,
+    id_penerbangan_pulang: ticketPulang,
+    nama_lengkap: '',
+    nama_keluarga: '',
+    nomor_telepon: '',
     email: '',
+    jumlah_penumpang: '',
   });
+
+  const [occupiedSeats, setOccupiedSeats] = useState([]);
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const totalSeats = 72;
+
+  useEffect(() => {
+    const getKursi = async () => {
+      try {
+        const response = await axios.get('/api/getKursi');
+        const kursiData = response.data.data;
+        const occupiedSeatCodes = kursiData.map((seat) => seat.kursi);
+
+        const allOccupiedSeats = occupiedSeatCodes.join(',');
+
+        const individualSeats = allOccupiedSeats.split(',');
+
+        setOccupiedSeats(individualSeats);
+      } catch (error) {
+        console.log(error.message);
+      }
+    };
+
+    getKursi();
+  }, []);
+
+  const isSeatOccupied = (seatCode) => {
+    return occupiedSeats.includes(seatCode);
+  };
+
+  const renderSeats = () => {
+    const seats = [];
+
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let alphabetIndex = 0;
+
+    for (let seatNumber = 1; seatNumber <= totalSeats; seatNumber++) {
+      const row = alphabet[alphabetIndex];
+      const seatCode = `${row}${Math.ceil(seatNumber / alphabet.length)}`;
+      const isOccupied = isSeatOccupied(seatCode);
+      const seatColor = isOccupied ? styles.occupiedSeat : styles.availableSeat;
+
+      if (isOccupied) {
+        seats.push(
+          <div key={seatNumber} className={`${styles.seat} ${seatColor}`}>
+            {seatCode}
+          </div>
+        );
+      } else {
+        seats.push(
+          <div key={seatNumber} className={`${styles.seat} ${seatColor} ${styles.clickable}`} onClick={() => handleSeatClick(seatCode)}>
+            {seatCode}
+          </div>
+        );
+      }
+
+      if (alphabetIndex < alphabet.length - 1) {
+        alphabetIndex++;
+      } else {
+        alphabetIndex = 0;
+      }
+    }
+
+    return seats;
+  };
+
+  const handleSeatClick = (seatCode) => {
+    if (isSeatOccupied(seatCode)) {
+      const updatedOccupiedSeats = occupiedSeats.filter((seat) => seat !== seatCode);
+      const updatedSelectedSeats = selectedSeats.filter((seat) => seat !== seatCode);
+      setOccupiedSeats(updatedOccupiedSeats);
+      setSelectedSeats(updatedSelectedSeats);
+    } else {
+      const updatedOccupiedSeats = [...occupiedSeats, seatCode];
+      const updatedSelectedSeats = [...selectedSeats, seatCode];
+      setOccupiedSeats(updatedOccupiedSeats);
+      setSelectedSeats(updatedSelectedSeats);
+    }
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -29,43 +112,100 @@ const DetailSearching = ({ accessToken }) => {
         const response = await axios.get(`http://localhost:5000/v1/api/select-ticket-round-trip/${ticketBerangkat}/${ticketPulang}`);
         setData(response.data.data);
       } catch (error) {
-        console.log('error:' + error.response.data);
+        console.log('error:' + error.response);
       }
     };
 
     detailPenerbangan();
   }, [ticketBerangkat, ticketPulang]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Add your form submission logic here
-    console.log('Form data submitted:', formData);
+    try {
+      const accessToken = Cookies.get('accessToken');
+
+      if (!accessToken) {
+        Swal.fire({
+          title: 'Silakan login terlebih dahulu',
+          text: '',
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        return;
+      }
+
+      const updatedFormData = {
+        id_penerbangan_berangkat: parseInt(ticketBerangkat),
+        id_penerbangan_pulang: parseInt(ticketPulang),
+        nama_lengkap: formData.nama_lengkap,
+        nama_keluarga: formData.nama_keluarga,
+        nomor_telepon: formData.nomor_telepon,
+        email: formData.email,
+        jumlah_penumpang: parseInt(formData.jumlah_penumpang),
+        kursi: selectedSeats.join(','),
+      };
+
+      const response = await axios.post('/api/orderRoundTrip', updatedFormData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      Swal.fire({
+        title: response.data.message,
+        text: 'Silakan lakukan pembayaran!',
+        timer: 3000,
+        showConfirmButton: true,
+        icon: 'success',
+      }).then(() => {
+        router.push(`/payment/roundtrip?order=${response.data.data.id}`);
+      });
+    } catch (error) {
+      console.log(error.response);
+      Swal.fire({
+        title: error.response,
+        text: '',
+        timer: 3000,
+        showConfirmButton: true,
+        icon: 'error',
+      });
+    }
   };
 
   return (
     <Row>
       <h3 className="text-center fw-bold">{accessToken ? '' : <div className="alert alert-danger">Silakan Login Terlebih Dahulu Untuk Memesan Tiket!</div>}</h3>
       <Col md={7} style={{ width: '30rem' }}>
-        <Card>
+        <Card className="mb-3">
           <Card.Body>
             <Card.Title className="fw-bold">Isi Data Pemesan</Card.Title>
             <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="name">
-                <Form.Label>Nama</Form.Label>
-                <Form.Control type="text" name="nama" value={formData.nama} onChange={handleInputChange} placeholder="Masukkan nama anda" />
+              <Form.Group controlId="nama_lengkap">
+                <Form.Label>Nama Lengkap</Form.Label>
+                <Form.Control type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleInputChange} placeholder="Masukkan nama anda" />
               </Form.Group>
-              <Form.Group controlId="name">
+              <Form.Group controlId="nama_keluarga">
                 <Form.Label>Nama Keluarga</Form.Label>
-                <Form.Control type="text" name="namaKeluarga" value={formData.namaKeluarga} onChange={handleInputChange} placeholder="Masukkan nama keluarga anda" />
+                <Form.Control type="text" name="nama_keluarga" value={formData.nama_keluarga} onChange={handleInputChange} placeholder="Masukkan nama keluarga anda" />
               </Form.Group>
-              <Form.Group controlId="name">
+              <Form.Group controlId="nomor_telepon">
                 <Form.Label>Nomor Telepon</Form.Label>
-                <Form.Control type="text" name="nomorTelepon" value={formData.nomorTelepon} onChange={handleInputChange} placeholder="Masukkan nomor telepom amda" />
+                <Form.Control type="text" name="nomor_telepon" value={formData.nomor_telepon} onChange={handleInputChange} placeholder="Masukkan nomor telepom amda" />
               </Form.Group>
               <Form.Group controlId="email">
                 <Form.Label>Email</Form.Label>
                 <Form.Control type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Masukkan email anda" />
               </Form.Group>
+              <Form.Group controlId="jumlah_penumpang">
+                <Form.Label>Jumlah Penumpang</Form.Label>
+                <Form.Control type="text" name="jumlah_penumpang" value={formData.jumlah_penumpang} onChange={handleInputChange} placeholder="Masukkan email anda" />
+              </Form.Group>
+              <Card className="mt-3 mb-3">
+                <div className="mt-4 p-2">
+                  <h5 className={`${styles.spanHarga} fw-bold`}>Pilihan Kursi</h5>
+                  <div className={styles.seatContainer}>{renderSeats()}</div>
+                </div>
+              </Card>
               <Button type="submit" variant="primary">
                 Submit
               </Button>
@@ -115,7 +255,7 @@ const DetailSearching = ({ accessToken }) => {
         </Card>
         <Card className="mb-3">
           <div className="mt-4 p-2">
-            <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan Berangkat</h5>
+            <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan Pulang</h5>
             {data.return && (
               <div>
                 <div className="d-flex">
