@@ -42,7 +42,6 @@ const HistoryOrder = ({ accessToken }) => {
         });
         setData(response.data.data);
         setDataId(response.data.data[0].order.id);
-        console.log(response.data.data);
       } catch (error) {
         Swal.fire({
           title: error.response.data.message,
@@ -78,7 +77,6 @@ const HistoryOrder = ({ accessToken }) => {
           },
         });
         setOrder(response.data.data);
-        console.log(response.data.data);
       } catch (error) {
         console.log(error.message);
       }
@@ -235,69 +233,76 @@ const HistoryOrder = ({ accessToken }) => {
                         </div>
                         {order.tiket && (
                           <div>
-                            <h5 className={`${styles.spanHarga} fw-bold mt-5`}>Detail Pesanan Pulang</h5>
-                            <div className="d-flex">
-                              {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_berangkat}</p>}
-                              <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
-                            </div>
-                            {order.tiket && <div className={`ms-3`}>{order.tiket.pulang.tanggal_berangkat}</div>}
-                            {order.tiket && (
-                              <div>
-                                <div className={`ms-3`}>{order.tiket.pulang.bandaraAwal.nama_bandara}</div> <hr />
-                              </div>
-                            )}
-                            {order.tiket && (
-                              <div>
-                                <div className={`fw-bold ms-5`}>
-                                  {order.tiket.pulang.maskapai.nama_maskapai} - {order.tiket.pulang.maskapai.tipe_maskapai}
+                            {order.tiket.pulang.id_penerbangan ? (
+                              <>
+                                <h5 className={`${styles.spanHarga} fw-bold mt-5`}>Detail Pesanan Pulang</h5>
+                                <div className="d-flex">
+                                  {order.tiket.pulang && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_berangkat}</p>}
+                                  <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
                                 </div>
-                                <div className={`fw-bold ms-5`}>{order.tiket.pulang.maskapai.kode_maskapai}</div>
-                              </div>
+                                {order.tiket.pulang && <div className={`ms-3`}>{order.tiket.pulang.tanggal_berangkat}</div>}
+                                {order.tiket.pulang && (
+                                  <div>
+                                    <div className={`ms-3`}>{order.tiket.pulang.bandaraAwal.nama_bandara}</div> <hr />
+                                  </div>
+                                )}
+                                {order.tiket.pulang && (
+                                  <div>
+                                    <div className={`fw-bold ms-5`}>
+                                      {order.tiket.pulang.maskapai.nama_maskapai} - {order.tiket.pulang.maskapai.tipe_maskapai}
+                                    </div>
+                                    <div className={`fw-bold ms-5`}>{order.tiket.pulang.maskapai.kode_maskapai}</div>
+                                  </div>
+                                )}
+                                <div className="d-block ms-5">
+                                  <div className={`fw-bold`}>Informasi : </div>
+                                  <div>Baggage 20 kg </div>
+                                  <div>Cabin Baggage 7 kg </div>
+                                  <div>In Flight Entertainment </div>
+                                </div>{' '}
+                                <hr />
+                                <div className="d-flex">
+                                  {order.tiket.pulang && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_kedatangan}</p>}
+                                  <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
+                                </div>
+                                {order.tiket && <div className={`ms-3`}>{order.tiket.pulang.tanggal_kedatangan}</div>}
+                                {order.tiket && (
+                                  <div>
+                                    <div className={`ms-3`}>{order.tiket.pulang.bandaraTujuan.nama_bandara}</div> <hr />
+                                  </div>
+                                )}
+                                <div className="fw-bold">Rincian harga</div>
+                                <div className="d-flex">
+                                  <p className="bg-transparent border border-light">Harga Tiket</p>
+                                  {order.tiket && (
+                                    <div className="ms-auto">
+                                      <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.maskapai.harga_tiket}</p>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="d-flex">
+                                  <p className="bg-transparent border border-light">Jumlah Penumpang</p>
+                                  {order.order && (
+                                    <div className="ms-auto">
+                                      <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{order.order.jumlah_penumpang}</p>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="d-flex">
+                                  <p className="bg-transparent border border-light">Total Harga Tiket Pulang</p>
+                                  {order.tiket && (
+                                    <div className="ms-auto">
+                                      <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.totalHargaTiketPulang}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </>
+                            ) : (
+                              ''
                             )}
-                            <div className="d-block ms-5">
-                              <div className={`fw-bold`}>Informasi : </div>
-                              <div>Baggage 20 kg </div>
-                              <div>Cabin Baggage 7 kg </div>
-                              <div>In Flight Fntertainment </div>
-                            </div>{' '}
-                            <hr />
-                            <div className="d-flex">
-                              {order.tiket && <p className="bg-transparent fw-bold border border-light">{order.tiket.pulang.jam_kedatangan}</p>}
-                              <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
-                            </div>
                           </div>
                         )}
-                        {order.tiket && <div className={`ms-3`}>{order.tiket.pulang.tanggal_kedatangan}</div>}
-                        {order.tiket && (
-                          <div>
-                            <div className={`ms-3`}>{order.tiket.pulang.bandaraTujuan.nama_bandara}</div> <hr />
-                          </div>
-                        )}
-                        <div className="fw-bold">Rincian harga</div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Harga Tiket</p>
-                          {order.tiket && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.maskapai.harga_tiket}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Jumlah Penumpang</p>
-                          {order.order && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{order.order.jumlah_penumpang}</p>
-                            </div>
-                          )}
-                        </div>
-                        <div className="d-flex">
-                          <p className="bg-transparent border border-light">Total Harga Tiket Pulang</p>
-                          {order.tiket && (
-                            <div className="ms-auto">
-                              <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{order.tiket.pulang.totalHargaTiketPulang}</p>
-                            </div>
-                          )}
-                        </div>
+
                         <div className="d-flex">
                           <p className="bg-transparent border border-light fw-bold">Total Harga Tiket</p>
                           {order && (

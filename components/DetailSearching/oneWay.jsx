@@ -149,6 +149,17 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         kursi: selectedSeats.join(','),
       };
 
+      if (updatedFormData.jumlah_penumpang !== selectedSeats.length) {
+        Swal.fire({
+          title: 'Jumlah penumpang tidak sesuai dengan jumlah kursi yang dipilih',
+          text: '',
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        return;
+      }
+
       const response = await axios.post('/api/order', updatedFormData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -164,8 +175,13 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         router.push(`/payment?order=${response.data.data.id}`);
       });
     } catch (error) {
-      console.log('error : ', error.response);
-      console.log(error.message);
+      Swal.fire({
+        title: error.response.data.message,
+        text: '',
+        showConfirmButton: true,
+        timer: 3000,
+        icon: 'error',
+      });
     }
   };
 

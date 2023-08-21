@@ -232,6 +232,52 @@
   cursor: pointer;
 }
 
+.notification {
+  cursor: pointer;
+}
+
+.headerFont {
+  font-family: 'Unbounded', cursive;
+  font-weight: 800;
+}
+
+.headerExplaination {
+  font-family: 'Unbounded', cursive;
+  font-weight: 200;
+}
+
+.headerDetail {
+  font-family: 'Space Mono', monospace;
+}
+
+.belum-dibaca {
+  background-color: #ffc107; 
+  border: 1px solid #ffc107; 
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.dibaca {
+  background-color: #f0f0f0; 
+  border: 1px solid #ddd; 
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.icon-belum-dibaca {
+  color: #ffc107; 
+  margin-right: 10px; 
+  font-size: 20px; 
+}
+
+.icon-dibaca {
+  color: #4caf50; 
+  margin-right: 10px; 
+  font-size: 20px; 
+}
+
 
 /* Enable hover only on non-touch devices */
 /* @media (hover: hover) and (pointer: fine) {
