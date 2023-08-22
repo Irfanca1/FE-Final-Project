@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from '@/styles/Home.module.css';
-import { RiLoginBoxLine, RiLogoutBoxLine, RiUserLine, RiHistoryLine } from 'react-icons/ri';
+import { RiLoginBoxLine, RiLogoutBoxLine, RiUserLine, RiHistoryLine, RiCheckLine } from 'react-icons/ri';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
@@ -26,7 +26,18 @@ const Navbar = ({ accessToken, username }) => {
     if (accessToken) {
       import('bootstrap/dist/js/bootstrap.bundle.min.js');
     }
+
+    const storedNotifications = localStorage.getItem('notifications');
+    if (storedNotifications) {
+      setNotifications(JSON.parse(storedNotifications));
+    }
+
+    notificationClick();
   }, [accessToken]);
+
+  useEffect(() => {
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+  }, [notifications]);
 
   const handleLogout = () => {
     Cookies.remove('accessToken');
@@ -56,12 +67,32 @@ const Navbar = ({ accessToken, username }) => {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-        setNotifications(response.data.data);
+        const newNotifications = response.data.data;
+        const hasUnreadNotifications = newNotifications.some((notif) => notif.status === 'belum-dibaca');
+
+        console.log(hasUnreadNotifications);
+        if (hasUnreadNotifications) {
+          const notificationsWithStatus = newNotifications.map((notif) => ({
+            ...notif,
+            status: notif.status === 'sudah-dibaca' ? 'sudah-dibaca' : 'belum-dibaca',
+          }));
+          setNotifications(notificationsWithStatus);
+        }
       } else {
         const response = await axios.get('/api/notification');
-        setNotifications(response.data.data);
+        const newNotifications = response.data.data;
+
+        const hasUnreadNotifications = newNotifications.some((notif) => notif.status === 'belum-dibaca');
+        if (hasUnreadNotifications) {
+          const notificationsWithStatus = newNotifications.map((notif) => ({
+            ...notif,
+            status: notif.status === 'sudah-dibaca' ? 'sudah-dibaca' : 'belum-dibaca',
+          }));
+          setNotifications(notificationsWithStatus);
+        }
       }
     } catch (error) {
+      console.log(error.response);
       Swal.fire({
         title: error.response.data.message,
         text: 'Internal server error',
@@ -69,6 +100,24 @@ const Navbar = ({ accessToken, username }) => {
         showConfirmButton: true,
         timer: 2000,
       });
+    }
+  };
+
+  const handleNotificationClick = async (event, notifId) => {
+    event.preventDefault();
+    const clickedNotification = notifications.find((notif) => notif.id === notifId);
+
+    if (clickedNotification && clickedNotification.status === 'belum-dibaca') {
+      try {
+        await axios.put(`http://localhost:5000/v1/api/update-notification/${notifId}`, {
+          status: 'sudah-dibaca',
+        });
+
+        const updatedNotifications = notifications.map((notif) => (notif.id === notifId ? { ...notif, status: 'sudah-dibaca' } : notif));
+        setNotifications(updatedNotifications);
+      } catch (error) {
+        console.error('Gagal memperbarui status notifikasi:', error);
+      }
     }
   };
 
@@ -88,18 +137,25 @@ const Navbar = ({ accessToken, username }) => {
           {accessToken ? (
             <div className="d-flex">
               <div className="" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <IoMdNotificationsOutline className={`fs-3 me-4 mt-2 ${styles.notification}`} onClick={notificationClick} />
+                <IoMdNotificationsOutline className={`fs-1 p-1 me-3 mt-2 border rounded-circle ${styles.notification}`} onClick={notificationClick} />
+                {notifications.some((notif) => notif.status === 'belum-dibaca') && (
+                  <span className="position-absolute top-0 mt-4 badge rounded-pill bg-danger" style={{ left: '64.5rem', fontSize: '11px' }}>
+                    {notifications.filter((notif) => notif.status === 'belum-dibaca').length}
+                  </span>
+                )}
               </div>
+
               {/* NOTIFICATION DROPDOWN */}
               <div className="dropdown" style={{ position: 'relative', left: '-30rem' }}>
-                <ul className="dropdown-menu" aria-labelledby="notifDropdown" style={{ width: '30rem', maxWidth: '30rem', whiteSpace: 'pre-wrap', maxHeight: '15rem', overflowY: 'auto' }}>
+                <ul className="dropdown-menu" aria-labelledby="notifDropdown" style={{ width: '30rem', maxWidth: '30rem', whiteSpace: 'pre-wrap', maxHeight: '15rem', overflowY: 'auto', backgroundColor: '#fce4fc' }}>
                   {notifications.map((notif, index) => (
                     <li
                       className={`p-2`}
                       style={{
-                        background: index % 2 === 0 ? '#f0f0f0' : '#fff',
+                        background: notif.status === 'sudah-dibaca' ? '#fff' : '#fce4fc',
                       }}
                       key={notif.id}
+                      onClick={(event) => handleNotificationClick(event, notif.id)}
                     >
                       <div className="flex">
                         <div className={`${styles.description} d-flex align-items-center`}>

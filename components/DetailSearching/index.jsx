@@ -146,6 +146,17 @@ const DetailSearching = ({ accessToken }) => {
         kursi: selectedSeats.join(','),
       };
 
+      if (updatedFormData.jumlah_penumpang !== selectedSeats.length) {
+        Swal.fire({
+          title: 'Jumlah penumpang tidak sesuai dengan jumlah kursi yang dipilih',
+          text: '',
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: true,
+        });
+        return;
+      }
+
       const response = await axios.post('/api/orderRoundTrip', updatedFormData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -213,7 +224,7 @@ const DetailSearching = ({ accessToken }) => {
           </Card.Body>
         </Card>
       </Col>
-      <Col md={5}>
+      <Col md={5} style={{ width: '25rem' }}>
         <Card className="mb-3">
           <div className="mt-4 p-2">
             <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan Berangkat</h5>

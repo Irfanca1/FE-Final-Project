@@ -79,7 +79,7 @@ const PaymentRoundTrip = ({ accessToken }) => {
         return;
       }
 
-      const response = await axios.post(`/api/RoundTrip`, formData, {
+      const response = await axios.post(`/api/payment`, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -95,6 +95,7 @@ const PaymentRoundTrip = ({ accessToken }) => {
         router.push('/historyorder');
       });
     } catch (error) {
+      console.log(error.response);
       Swal.fire({
         title: error.response.data.message,
         text: 'Silakan cek kembali',
