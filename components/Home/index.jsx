@@ -166,7 +166,9 @@ const HalamanUtama = () => {
                   From
                 </InputGroup.Text>
                 <FormControl as="select" id="from" value={fromLocation} onChange={(e) => setFromLocation(e.target.value)}>
-                  <option selected>Choose...</option>
+                  <option key="Choose" value="Choose...">
+                    Choose...
+                  </option>
                   {dataKota.map((kota) => (
                     <option key={kota.id} value={kota.kota}>
                       {kota.kota}
@@ -187,7 +189,9 @@ const HalamanUtama = () => {
                   To
                 </InputGroup.Text>
                 <FormControl as="select" id="to" value={toLocation} onChange={(e) => setToLocation(e.target.value)}>
-                  <option selected>Choose...</option>
+                  <option key="Choose" value="Choose...">
+                    Choose...
+                  </option>
                   {dataKota.map((kota) => (
                     <option key={kota.id} value={kota.kota}>
                       {kota.kota}
@@ -254,7 +258,7 @@ const HalamanUtama = () => {
                   <Col>
                     <InputGroup className="mb-3">
                       <FormControl as="select" id="to">
-                        <option selected>Choose...</option>
+                        <option value="Choose...">Choose...</option>
                         <option value="1">One</option>
                         <option value="2">Two</option>
                         <option value="3">Three</option>

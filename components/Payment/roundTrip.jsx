@@ -155,9 +155,9 @@ const PaymentRoundTrip = ({ accessToken }) => {
                   )}
                   {formData.metodePembayaran === 'transferBank' && (
                     <div>
-                      <p>Silakan transfer ke rekening berikut:</p>
-                      <p>Nomor Rekening: xxx-xxx-xxx</p>
-                      <p>Bank: Bank ABC</p>
+                      <div>Silakan transfer ke rekening berikut:</div>
+                      <div>Nomor Rekening: xxx-xxx-xxx</div>
+                      <div>Bank: Bank ABC</div>
                     </div>
                   )}
                   <Button type="submit" variant="primary" onClick={handleSubmit}>

@@ -198,8 +198,8 @@ const HasilPencarian = () => {
                         <div className="mt-4">
                           <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan</h5>
                           <div className="d-flex">
-                            <p className="bg-transparent fw-bold border border-light">{data.jam_berangkat}:00</p>
-                            <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
+                            <div className="bg-transparent fw-bold border border-light">{data.jam_berangkat}:00</div>
+                            <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</div>
                           </div>
                           <div className={`ms-3`}>{data.tanggal_berangkat}</div>
                           <div className={`ms-3`}>{data.bandaraAwal.nama_bandara}</div> <hr />{' '}
@@ -215,8 +215,8 @@ const HasilPencarian = () => {
                           </div>{' '}
                           <hr />
                           <div className="d-flex">
-                            <p className="bg-transparent fw-bold border border-light">{data.jam_kedatangan}:00</p>
-                            <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
+                            <div className="bg-transparent fw-bold border border-light">{data.jam_kedatangan}:00</div>
+                            <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</div>
                           </div>
                           <div className={`ms-3`}>{data.tanggal_berangkat}</div>
                           <div className={`ms-3`}>{data.bandaraTujuan.nama_bandara}</div> <hr />{' '}

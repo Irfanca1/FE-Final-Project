@@ -68,13 +68,13 @@ const Navbar = ({ accessToken, username }) => {
           },
         });
         const newNotifications = response.data.data;
-        const hasUnreadNotifications = newNotifications.some((notif) => notif.status === 'belum-dibaca');
+        const hasUnreadNotifications = newNotifications.map((notif) => notif.status === 'belum-dibaca');
 
-        console.log(hasUnreadNotifications);
         if (hasUnreadNotifications) {
           const notificationsWithStatus = newNotifications.map((notif) => ({
             ...notif,
             status: notif.status === 'sudah-dibaca' ? 'sudah-dibaca' : 'belum-dibaca',
+            key: notif.id,
           }));
           setNotifications(notificationsWithStatus);
         }
@@ -87,6 +87,7 @@ const Navbar = ({ accessToken, username }) => {
           const notificationsWithStatus = newNotifications.map((notif) => ({
             ...notif,
             status: notif.status === 'sudah-dibaca' ? 'sudah-dibaca' : 'belum-dibaca',
+            key: notif.id,
           }));
           setNotifications(notificationsWithStatus);
         }
@@ -151,10 +152,10 @@ const Navbar = ({ accessToken, username }) => {
                   {notifications.map((notif, index) => (
                     <li
                       className={`p-2`}
+                      key={notif.id}
                       style={{
                         background: notif.status === 'sudah-dibaca' ? '#fff' : '#fce4fc',
                       }}
-                      key={notif.id}
                       onClick={(event) => handleNotificationClick(event, notif.id)}
                     >
                       <div className="flex">
@@ -211,7 +212,10 @@ const Navbar = ({ accessToken, username }) => {
               <div className="dropdown" style={{ position: 'relative', left: '-30rem' }}>
                 <ul className="dropdown-menu" aria-labelledby="notifDropdown" style={{ width: '30rem', maxWidth: '30rem', whiteSpace: 'pre-wrap' }}>
                   {notifications.map((notif) => (
-                    <li className="p-2">
+                    <li
+                      className={`p-2`}
+                      key={notif.id} // Tambahkan key di sini
+                    >
                       <div className="flex">
                         <div className={`${styles.description} d-flex align-items-center`}>
                           <IoMdNotificationsOutline className={`fs-5 me-1 ${styles.notification}`} />

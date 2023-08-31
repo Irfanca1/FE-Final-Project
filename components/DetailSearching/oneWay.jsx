@@ -175,6 +175,7 @@ const DetailSearchingOneWay = ({ accessToken }) => {
         router.push(`/payment?order=${response.data.data.id}`);
       });
     } catch (error) {
+      console.log(error.response);
       Swal.fire({
         title: error.response.data.message,
         text: '',

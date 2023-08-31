@@ -141,28 +141,30 @@ const HasilPencarianRoundTrip = () => {
       <div className={`fs-5 text-center mb-5 rounded text-light fw-bold ${styles.boxPilihPenerbangan}`}>Pilih Penerbangan Berangkat</div>
       <div className={`${styles.description}`}>
         {dataTicket.length === 0 ? (
-          <Row>
-            <Col md={4} className="mb-5">
-              <div className="card" style={{ width: '18rem' }}>
-                <div className="card-body">
-                  <h5 className="card-title fw-bold">Filter</h5>
+          <div>
+            <Row>
+              <Col md={4} className="mb-5">
+                <div className="card" style={{ width: '18rem' }}>
+                  <div className="card-body">
+                    <h5 className="card-title fw-bold">Filter</h5>
+                  </div>
+                  <Button variant="transparent" className="list-group list-group-flush" onClick={handleClickHargaTermurah}>
+                    <li className="list-group-item">
+                      <ImPriceTags /> Harga Termurah
+                    </li>
+                  </Button>
+                  <Button variant="transparent" className="list-group list-group-flush" onClick={handleClickHargaTermahal}>
+                    <li className="list-group-item">
+                      <ImPriceTags /> Harga Termahal
+                    </li>
+                  </Button>
                 </div>
-                <Button variant="transparent" className="list-group list-group-flush" onClick={handleClickHargaTermurah}>
-                  <li className="list-group-item">
-                    <ImPriceTags /> Harga Termurah
-                  </li>
-                </Button>
-                <Button variant="transparent" className="list-group list-group-flush" onClick={handleClickHargaTermahal}>
-                  <li className="list-group-item">
-                    <ImPriceTags /> Harga Termahal
-                  </li>
-                </Button>
-              </div>
-            </Col>
-            <Col>
-              <div className="fs-2">Mohon Maaf,Tidak ada penerbangan pada tanggal ini!</div>
-            </Col>
-          </Row>
+              </Col>
+              <Col>
+                <div className="fs-2">Mohon Maaf,Tidak ada penerbangan pada tanggal ini!</div>
+              </Col>
+            </Row>
+          </div>
         ) : (
           <div>
             <Row>
@@ -221,30 +223,34 @@ const HasilPencarianRoundTrip = () => {
                       </Card.Text>
                       {showDetail === data.id && (
                         <div className="mt-4">
-                          <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan</h5>
-                          <div className="d-flex">
-                            <p className="bg-transparent fw-bold border border-light">{data.jam_berangkat}:00</p>
-                            <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</p>
-                          </div>
-                          <div className={`ms-3`}>{data.tanggal_berangkat}</div>
-                          <div className={`ms-3`}>{data.bandaraAwal.nama_bandara}</div> <hr />{' '}
-                          <div className={`fw-bold ms-3`}>
-                            {data.maskapai.nama_maskapai} - {data.maskapai.tipe_maskapai}
-                          </div>
-                          <div className={`fw-bold ms-3`}>{data.maskapai.kode_maskapai}</div> <hr />
-                          <div className="d-block">
-                            <div className={`fw-bold ms-3`}>Informasi : </div>
-                            <div className={` ms-3`}>Baggage 20 kg </div>
-                            <div className={` ms-3`}>Cabin Baggage 7 kg </div>
-                            <div className={` ms-3`}>In Flight Fntertainment </div>
-                          </div>{' '}
-                          <hr />
-                          <div className="d-flex">
-                            <p className="bg-transparent fw-bold border border-light">{data.jam_kedatangan}:00</p>
-                            <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
-                          </div>
-                          <div className={`ms-3`}>{data.tanggal_berangkat}</div>
-                          <div className={`ms-3`}>{data.bandaraTujuan.nama_bandara}</div> <hr />{' '}
+                          <h5 className="fw-bold">Detail Penerbangan</h5>
+                          <Card className="mb-3">
+                            <Card.Body>
+                              <div className="d-flex">
+                                <div className="bg-transparent fw-bold border border-light">{data.jam_berangkat}:00</div>
+                                <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</div>
+                              </div>
+                              <div className={`ms-3`}>{data.tanggal_berangkat}</div>
+                              <div className={`ms-3`}>{data.bandaraAwal.nama_bandara}</div> <hr />{' '}
+                              <div className={`fw-bold ms-3`}>
+                                {data.maskapai.nama_maskapai} - {data.maskapai.tipe_maskapai}
+                              </div>
+                              <div className={`fw-bold ms-3`}>{data.maskapai.kode_maskapai}</div> <hr />
+                              <div className="d-block">
+                                <div className={`fw-bold ms-3`}>Informasi : </div>
+                                <div className={` ms-3`}>Baggage 20 kg </div>
+                                <div className={` ms-3`}>Cabin Baggage 7 kg </div>
+                                <div className={` ms-3`}>In Flight Entertainment </div>
+                              </div>{' '}
+                              <hr />
+                              <div className="d-flex">
+                                <div className="bg-transparent fw-bold border border-light">{data.jam_kedatangan}:00</div>
+                                <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</div>
+                              </div>
+                              <div className={`ms-3`}>{data.tanggal_berangkat}</div>
+                              <div className={`ms-3`}>{data.bandaraTujuan.nama_bandara}</div> <hr />
+                            </Card.Body>
+                          </Card>
                         </div>
                       )}
                     </Card.Body>

@@ -123,12 +123,17 @@ const HistoryOrder = ({ accessToken }) => {
                             <div className="bg-success text-light rounded fw-bold fs-5 text-center p-2" style={{ width: '100px' }}>
                               {data.order.status_pembayaran}
                             </div>
-                          ) : (
+                          ) : data.order.status_pembayaran === 'unpaid' ? (
                             <div className="bg-danger text-light rounded fw-bold fs-5 text-center p-2" style={{ width: '100px' }}>
+                              {data.order.status_pembayaran}
+                            </div>
+                          ) : (
+                            <div className="bg-secondary text-light rounded fw-bold fs-5 text-center p-2" style={{ width: '150px' }}>
                               {data.order.status_pembayaran}
                             </div>
                           )}
                         </div>
+
                         <div className="d-flex">
                           <Card.Title className="fw-bold"></Card.Title>
                         </div>
