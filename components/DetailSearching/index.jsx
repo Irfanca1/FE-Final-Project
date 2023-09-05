@@ -186,7 +186,7 @@ const DetailSearching = ({ accessToken }) => {
   return (
     <Row>
       <h3 className="text-center fw-bold">{accessToken ? '' : <div className="alert alert-danger">Silakan Login Terlebih Dahulu Untuk Memesan Tiket!</div>}</h3>
-      <Col md={7} style={{ width: '30rem' }}>
+      <Col md={7} style={{ width: '40rem' }}>
         <Card className="mb-3">
           <Card.Body>
             <Card.Title className="fw-bold">Isi Data Pemesan</Card.Title>

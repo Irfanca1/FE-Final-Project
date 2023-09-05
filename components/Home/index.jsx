@@ -210,7 +210,7 @@ const HalamanUtama = () => {
                       <BsFillCalendarDateFill className="me-3" />
                       Date Departure
                     </InputGroup.Text>
-                    <DatePicker className="form-control" selected={selectedDate} onChange={handleDateChange} locale="id" dateFormat="dd MMMM yyyy" placeholderText="Pilih tanggal" />
+                    <DatePicker className="form-control" selected={selectedDate} onChange={handleDateChange} locale="id" dateFormat="dd MMMM yyyy" placeholderText="Pilih tanggal" minDate={new Date()} maxDate={selectedDateReturn} />
                   </InputGroup>
                 </Col>
                 <Col>
@@ -219,7 +219,7 @@ const HalamanUtama = () => {
                       <BsFillCalendarDateFill className="me-3" />
                       Date Return
                     </InputGroup.Text>
-                    <DatePicker className="form-control" selected={selectedDateReturn} onChange={handleDateChangeReturn} locale="id" dateFormat="dd MMMM yyyy" placeholderText="Pilih tanggal" disabled={!isRoundtrip} />
+                    <DatePicker className="form-control" selected={selectedDateReturn} onChange={handleDateChangeReturn} locale="id" dateFormat="dd MMMM yyyy" placeholderText="Pilih tanggal" disabled={!isRoundtrip} minDate={selectedDate} />
                   </InputGroup>
                 </Col>
               </Row>

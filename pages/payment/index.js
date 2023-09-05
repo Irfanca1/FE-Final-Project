@@ -11,7 +11,7 @@ export default function Pembayaran(props) {
   return (
     <>
       <Head>
-        <title>Detail Penerbangan One Way</title>
+        <title>Pembayaran Tiket</title>
       </Head>
       <Navbar accessToken={props.accessToken} username={props.username} />
       <main className={`${styles.main} ${inter.className}`}>

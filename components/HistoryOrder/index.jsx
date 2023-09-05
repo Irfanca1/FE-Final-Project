@@ -266,7 +266,7 @@ const HistoryOrder = ({ accessToken }) => {
                                   {order.tiket.pulang && <div className={`ms-3`}>{order.tiket.pulang.tanggal_berangkat}</div>}
                                   {order.tiket.pulang && (
                                     <div>
-                                      <div className={`ms-3`}>{order.tiket.pulang.bandaraAwal.nama_bandara}</div> <hr />
+                                      <div className={`ms-3`}>{order.tiket.pulang.bandaraTujuan.nama_bandara}</div> <hr />
                                     </div>
                                   )}
                                   {order.tiket.pulang && (

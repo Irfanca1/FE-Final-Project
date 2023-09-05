@@ -43,12 +43,13 @@ const Payment = ({ accessToken }) => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/v1/api/get-order/${order}`, {
+        const response = await axios.get(`http://localhost:5000/v1/api/get-order-round-trip/${order}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         });
         setData(response.data.data);
+        console.log(response.data.data);
       } catch (error) {
         console.log(error.response);
       }
@@ -88,6 +89,7 @@ const Payment = ({ accessToken }) => {
         router.push('/historyorder');
       });
     } catch (error) {
+      console.log(error.res);
       Swal.fire({
         title: error.response.data.message,
         text: 'Silakan cek kembali',
@@ -159,11 +161,11 @@ const Payment = ({ accessToken }) => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={5} className="mb-3" style={{ width: '25rem' }}>
+          <Col md={5} className="mb-3" style={{ width: '27rem' }}>
             <Card>
               <Card className="mb-3">
                 <div className="mt-4 p-2">
-                  <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan</h5>
+                  <h5 className={`${styles.spanHarga} fw-bold`}>Detail Penerbangan Berangkat</h5>
                   {data.order && (
                     <h5 className={`fw-bold`}>
                       Kode Booking: <span className={`${styles.spanHarga} fw-bold`}>{data.order.kode_booking}</span>
@@ -171,13 +173,13 @@ const Payment = ({ accessToken }) => {
                   )}
                   <div>
                     <div className="d-flex">
-                      {data.tiket && <p className="bg-transparent fw-bold border border-light">{data.tiket.jam_berangkat}:00</p>}
-                      <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
+                      {data.tiket && <div className="bg-transparent fw-bold border border-light ms-3">{data.tiket.berangkat.jam_berangkat}</div>}
+                      <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</div>
                     </div>
-                    {data.tiket && <div className={`ms-3`}>{data.tiket.tanggal_berangkat}</div>}
+                    {data.tiket && <div className={`ms-3`}>{data.tiket.berangkat.tanggal_berangkat}</div>}
                     {data.tiket && (
                       <div>
-                        <div className={`ms-3`}>{data.tiket.bandaraAwal.nama_bandara}</div> <hr />
+                        <div className={`ms-3`}>{data.tiket.berangkat.bandaraAwal.nama_bandara}</div> <hr />
                       </div>
                     )}
                     {data.maskapai && (
@@ -196,42 +198,122 @@ const Payment = ({ accessToken }) => {
                     </div>{' '}
                     <hr />
                     <div className="d-flex">
-                      {data.tiket && <p className="bg-transparent fw-bold border border-light">{data.tiket.jam_kedatangan}:00</p>}
-                      <p className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</p>
+                      {data.tiket && <div className="bg-transparent fw-bold border border-light ms-3">{data.tiket.berangkat.jam_kedatangan}</div>}
+                      <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</div>
                     </div>
-                    {data.tiket && <div className={`ms-3`}>{data.tiket.tanggal_kedatangan}</div>}
+                    {data.tiket && <div className={`ms-3`}>{data.tiket.berangkat.tanggal_kedatangan}</div>}
                     {data.tiket && (
                       <div>
-                        <div className={`ms-3`}>{data.tiket.bandaraTujuan.nama_bandara}</div> <hr />
+                        <div className={`ms-3`}>{data.tiket.berangkat.bandaraTujuan.nama_bandara}</div> <hr />
                       </div>
                     )}
                     <div>
-                      <div className="fw-bold">Rincian harga</div>
+                      <div className="fw-bold ms-3 mb-3">Rincian harga</div>
                       <div className="d-flex">
-                        <p className="bg-transparent border border-light">Harga Tiket</p>
+                        <div className="bg-transparent border border-light ms-3 mb-2">Harga Tiket</div>
                         {data.tiket && (
                           <div className="ms-auto">
-                            <p className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{data.tiket.maskapai.harga_tiket}</p>
+                            <div className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{data.tiket.berangkat.maskapai.harga_tiket}</div>
                           </div>
                         )}
                       </div>
                       <div className="d-flex">
-                        <p className="bg-transparent border border-light">Jumlah Penumpang</p>
+                        <div className="bg-transparent border border-light ms-3 mb-2">Jumlah Penumpang</div>
                         {data.order && (
                           <div className="ms-auto">
-                            <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{data.order.jumlah_penumpang}</p>
+                            <div className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{data.order.jumlah_penumpang}</div>
                           </div>
                         )}
                       </div>
                       <div className="d-flex">
-                        <p className="bg-transparent border border-light fw-bold">Total Harga Tiket</p>
-                        {data && (
+                        <div className="bg-transparent border border-light ms-3 mb-2">Total Harga Tiket Berangkat</div>
+                        {data.tiket && (
                           <div className="ms-auto">
-                            <p className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{data.totalHargaTiket}</p>
+                            <div className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{data.tiket.berangkat.totalHargaTiketBerangkat}</div>
                           </div>
                         )}
                       </div>
                     </div>
+                  </div>
+                  {data.tiket && (
+                    <div>
+                      {data.tiket.pulang.id_penerbangan ? (
+                        <>
+                          <h5 className={`${styles.spanHarga} fw-bold mt-5`}>Detail Penerbangan Pulang</h5>
+                          <div className="d-flex">
+                            {data.tiket.pulang && <div className="bg-transparent fw-bold border border-light ms-3">{data.tiket.pulang.jam_berangkat}</div>}
+                            <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Keberangkatan</div>
+                          </div>
+                          {data.tiket.pulang && <div className={`ms-3`}>{data.tiket.pulang.tanggal_berangkat}</div>}
+                          {data.tiket.pulang && (
+                            <div>
+                              <div className={`ms-3`}>{data.tiket.pulang.bandaraTujuan.nama_bandara}</div> <hr />
+                            </div>
+                          )}
+                          {data.tiket.pulang && (
+                            <div>
+                              <div className={`fw-bold ms-5`}>
+                                {data.tiket.pulang.maskapai.nama_maskapai} - {data.tiket.pulang.maskapai.tipe_maskapai}
+                              </div>
+                              <div className={`fw-bold ms-5`}>{data.tiket.pulang.maskapai.kode_maskapai}</div>
+                            </div>
+                          )}
+                          <div className="d-block ms-5">
+                            <div className={`fw-bold`}>Informasi : </div>
+                            <div>Baggage 20 kg </div>
+                            <div>Cabin Baggage 7 kg </div>
+                            <div>In Flight Entertainment </div>
+                          </div>{' '}
+                          <hr />
+                          <div className="d-flex">
+                            {data.tiket.pulang && <div className="bg-transparent fw-bold border border-light ms-3">{data.tiket.pulang.jam_kedatangan}</div>}
+                            <div className={`${styles.spanHarga} bg-transparent fw-bold ms-auto border border-light`}>Kedatangan</div>
+                          </div>
+                          {data.tiket && <div className={`ms-3`}>{data.tiket.pulang.tanggal_kedatangan}</div>}
+                          {data.tiket && (
+                            <div>
+                              <div className={`ms-3`}>{data.tiket.pulang.bandaraAwal.nama_bandara}</div> <hr />
+                            </div>
+                          )}
+                          <div className="fw-bold ms-3 mb-3">Rincian harga</div>
+                          <div className="d-flex">
+                            <div className="bg-transparent border border-light ms-3 mb-2">Harga Tiket</div>
+                            {data.tiket && (
+                              <div className="ms-auto">
+                                <div className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{data.tiket.pulang.maskapai.harga_tiket}</div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="d-flex">
+                            <div className="bg-transparent border border-light ms-3 mb-2">Jumlah Penumpang</div>
+                            {data.order && (
+                              <div className="ms-auto">
+                                <div className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{data.order.jumlah_penumpang}</div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="d-flex">
+                            <div className="bg-transparent border border-light ms-3 mb-2">Total Harga Tiket Pulang</div>
+                            {data.tiket && (
+                              <div className="ms-auto">
+                                <div className={`bg-transparent fw-bold ms-auto border border-light  text-end`}>{data.tiket.pulang.totalHargaTiketPulang}</div>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        ''
+                      )}
+                    </div>
+                  )}
+
+                  <div className="d-flex">
+                    <div className="bg-transparent border border-light fw-bold ms-3">Total Harga Tiket</div>
+                    {data && (
+                      <div className="ms-auto">
+                        <div className={`bg-transparent fw-bold ms-auto border border-light text-end`}>{data.totalHargaTiket}</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
